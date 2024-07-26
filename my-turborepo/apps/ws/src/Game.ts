@@ -1,6 +1,7 @@
 import { WebSocket } from "ws";
 import { Chess } from "chess.js";
 import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
+import { User } from "./socketManager";
 
 interface moves {
   from: string;
@@ -14,9 +15,9 @@ export class Game {
   private moveCount = 0;
   private moves: moves[] = [];
 
-  constructor(player1: WebSocket, player2: WebSocket) {
-    this.player1 = player1;
-    this.player2 = player2;
+  constructor(player1: User, player2: User) {
+    this.player1 = player1.socket;
+    this.player2 = player2.socket;
     this.board = new Chess();
     this.startTime = new Date();
     this.player1.send(
@@ -24,6 +25,10 @@ export class Game {
         type: INIT_GAME,
         payload: {
           color: "white",
+          gameMetaData: {
+            whitePlayerName: player1.name,
+            blackPlayerName: player2.name,
+          },
         },
       })
     );
@@ -32,6 +37,10 @@ export class Game {
         type: INIT_GAME,
         payload: {
           color: "black",
+          gameMetaData: {
+            whitePlayerName: player1.name,
+            blackPlayerName: player2.name,
+          },
         },
       })
     );

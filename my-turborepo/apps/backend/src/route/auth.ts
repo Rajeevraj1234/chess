@@ -15,6 +15,8 @@ interface User {
 router.get("/refresh", async (req: Request, res: Response) => {
   if (req.user) {
     const user = req.user as User;
+    console.log(user);
+    
 
     // Token is issued so it can be shared b/w HTTP and ws server
     // Todo: Make this temporary and add refresh logic here
@@ -25,7 +27,7 @@ router.get("/refresh", async (req: Request, res: Response) => {
       },
     });
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    const token = jwt.sign({ userId: user.id , name:userDb?.name }, JWT_SECRET);
     res.json({
       token,
       id: user.id,

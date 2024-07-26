@@ -13,7 +13,7 @@ const Landing = () => {
         </h1>
         <div className="flex justify-center gap-5 items-center">
           <button
-            onClick={() => navigate("/game")}
+            onClick={() => navigate("/game/random")}
             className="px-10 py-5 mt-10 text-sm bg-green-500 font-bold rounded-md"
           >
             Play Online
