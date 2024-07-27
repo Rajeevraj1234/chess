@@ -1,49 +1,42 @@
 import { WebSocket } from "ws";
 import { Chess } from "chess.js";
 import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
-import { User } from "./socketManager";
+import { socketManager, User } from "./socketManager";
+import { randomUUID } from "crypto";
+import { db } from "./db";
+import { connect } from "http2";
 
 interface moves {
   from: string;
   to: string;
 }
 export class Game {
-  public player1: WebSocket;
-  public player2: WebSocket;
+  public gameId:string;
+  public player1UserId: string;
+  public player2UserId: string | null;
   public board: Chess;
-  private startTime: Date;
+  private startTime = new Date(Date.now());
+  private lastMoveTime = new Date(Date.now());
   private moveCount = 0;
   private moves: moves[] = [];
 
-  constructor(player1: User, player2: User) {
-    this.player1 = player1.socket;
-    this.player2 = player2.socket;
+  constructor(player1UserId: string, player2UserId: string|null,gameId?:string,startTime?:Date) {
+    this.gameId = gameId ?? randomUUID(),
+    this.player1UserId = player1UserId;
+    this.player2UserId = player2UserId;
     this.board = new Chess();
-    this.startTime = new Date();
-    this.player1.send(
-      JSON.stringify({
-        type: INIT_GAME,
-        payload: {
-          color: "white",
-          gameMetaData: {
-            whitePlayerName: player1.name,
-            blackPlayerName: player2.name,
-          },
-        },
-      })
-    );
-    this.player2.send(
-      JSON.stringify({
-        type: INIT_GAME,
-        payload: {
-          color: "black",
-          gameMetaData: {
-            whitePlayerName: player1.name,
-            blackPlayerName: player2.name,
-          },
-        },
-      })
-    );
+    if (startTime) {
+      this.startTime = startTime;
+      this.lastMoveTime = startTime;
+    }
+  }
+
+  public updateSecondPlayer(player2UserId:string){
+    this.player2UserId = player2UserId;
+
+    //add db call here
+
+   
   }
 
   makeMove(
@@ -73,7 +66,7 @@ export class Game {
     }
 
     if (this.moveCount % 2 === 0) {
-      this.player2.send(
+      this.player2?.send(
         JSON.stringify({
           type: MOVE,
           payload: { move, totalMoves: this.moves },
@@ -93,7 +86,7 @@ export class Game {
           payload: { move, totalMoves: this.moves },
         })
       );
-      this.player2.send(
+      this.player2?.send(
         JSON.stringify({
           type: MOVE,
           payload: { totalMoves: this.moves },
@@ -112,7 +105,7 @@ export class Game {
           },
         })
       );
-      this.player2.send(
+      this.player2?.send(
         JSON.stringify({
           type: GAME_OVER,
           payload: {
@@ -124,5 +117,35 @@ export class Game {
     }
 
     this.moveCount++;
+  }
+
+  async createGameInDb(){
+    this.startTime = new Date(Date.now());
+    this.lastMoveTime = this.startTime;
+
+    const game =  await db.game.create({
+      data:{
+        id:this.gameId,
+        timeControl:"CLASSICAL",
+        status:'IN_PROGRESS',
+        startAt:this.startTime;
+        currentFen:'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        whitePlayer:{
+          connect:{
+            id:this.player1UserId
+          }
+        },
+        blackPlayer:{
+          connect:{
+            id:this.player2UserId ?? ""
+          }
+        },
+      },
+      include: {
+        whitePlayer: true,
+        blackPlayer: true,
+      },
+    })
+    this.gameId = game.id;
   }
 }

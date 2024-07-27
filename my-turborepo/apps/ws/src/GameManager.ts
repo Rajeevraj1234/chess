@@ -27,7 +27,7 @@ export class GameManager {
 
       if (message.type === INIT_GAME) {
         if (this.pendingUser) {
-          const game = new Game(this.pendingUser, user);
+          const game = new Game(this.pendingUser.id, user.id);
           this.game.push(game);
           this.pendingUser = null;
         } else {

@@ -22,7 +22,7 @@ export interface gameMetaDataInterface {
 const Game = () => {
   const socket = useSocket();
 
-  const [chess, setChess] = useState(new Chess());
+  const [chess, _setChess] = useState(new Chess());
   const [board, setBoard] = useState(chess.board());
   const [gameMetaData, setGameMetaData] =
     useState<gameMetaDataInterface | null>(null);
@@ -30,7 +30,7 @@ const Game = () => {
   const [playerColor, setPlayerColor] = useState<string>("");
   const [isWinner, setIsWinner] = useState(false);
   const [totalMovesPlayed, setTotalMovesPlayed] = useState<moves[]>([]);
-
+  
   useEffect(() => {
     if (!socket) {
       return;
