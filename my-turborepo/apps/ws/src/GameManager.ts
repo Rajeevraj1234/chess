@@ -48,7 +48,7 @@ export class GameManager {
           await game.updateSecondPlayer(user.userId); 
           this.pendingGameId = null;
         } else {
-          const game = new Game(user.id,null);
+          const game = new Game(user.userId,null);
           this.games.push(game);
           this.pendingGameId = game.gameId;
           socketManager.addUser(user,game.gameId);

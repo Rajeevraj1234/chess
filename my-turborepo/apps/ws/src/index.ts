@@ -3,7 +3,9 @@ import { GameManager } from "./GameManager";
 import url from "url";
 import { extractAuthUser } from "./auth";
 
-const wss = new WebSocketServer({ port: 8080 });
+const PORT = 8080;
+
+const wss = new WebSocketServer({ port: PORT });
 
 const gameManager = new GameManager();
 
@@ -21,4 +23,4 @@ wss.on("connection", function connection(ws,req) {
   });
 });
 
-console.log("hello there");
+console.log("This is web socket server running in port",PORT);

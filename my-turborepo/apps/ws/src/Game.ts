@@ -6,6 +6,7 @@ import { randomUUID } from "crypto";
 import { db } from "./db";
 import { connect } from "http2";
 import { SocketAddress } from "net";
+import { log } from "console";
 
 interface moves {
   from: string;
@@ -27,8 +28,8 @@ export class Game {
     gameId?: string,
     startTime?: Date
   ) {
-    (this.gameId = gameId ?? randomUUID()),
-      (this.player1UserId = player1UserId);
+    this.gameId = gameId ?? randomUUID(),
+    this.player1UserId = player1UserId;
     this.player2UserId = player2UserId;
     this.board = new Chess();
     if (startTime) {
@@ -39,6 +40,9 @@ export class Game {
 
   async updateSecondPlayer(player2UserId: string) {
     this.player2UserId = player2UserId;
+    // console.log("Player 1",this.player1UserId);
+    // console.log("Player 2",this.player2UserId);
+    
 
     const users = await db.user.findMany({
       where: {
@@ -47,6 +51,8 @@ export class Game {
         },
       },
     });
+    // console.log("users",users);
+    
 
     //add db call here
     try {
@@ -68,7 +74,7 @@ export class Game {
         type: INIT_GAME,
         payload: {
           gameId: this.gameId,
-          whitePlayer: {
+          WhitePlayer: {
             name: WhitePlayer?.name,
             id: this.player1UserId,
             isGuest: "false",
