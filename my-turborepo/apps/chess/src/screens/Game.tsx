@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { Chess } from "chess.js";
+import { useUser } from "@repo/store/useUser";
 // import { Button } from "@repo/ui/button";
 
 // Constants
@@ -15,13 +16,21 @@ interface moves {
 }
 
 export interface gameMetaDataInterface {
-  whitePlayerName: string;
-  blackPlayerName: string;
+  whitePlayer: {
+    name: string;
+    id: string;
+    isGuest?: boolean;
+  };
+  blackPlayer: {
+    name: string;
+    id: string;
+    isGuest?: boolean;
+  };
 }
 
 const Game = () => {
   const socket = useSocket();
-
+  const user = useUser();
   const [chess, _setChess] = useState(new Chess());
   const [board, setBoard] = useState(chess.board());
   const [gameMetaData, setGameMetaData] =
@@ -30,7 +39,7 @@ const Game = () => {
   const [playerColor, setPlayerColor] = useState<string>("");
   const [isWinner, setIsWinner] = useState(false);
   const [totalMovesPlayed, setTotalMovesPlayed] = useState<moves[]>([]);
-  
+
   useEffect(() => {
     if (!socket) {
       return;
@@ -43,8 +52,15 @@ const Game = () => {
         case INIT_GAME:
           setBoard(chess.board());
           setStarted(true);
-          setPlayerColor(message.payload.color);
-          setGameMetaData(message.payload.gameMetaData);
+          // setPlayerColor(message.payload.color);
+          setGameMetaData({
+            whitePlayer: message.payload.WhitePlayer,
+            blackPlayer: message.payload.BlackPlayer,
+          });
+          
+          user.id === message.payload.WhitePlayer.id
+            ? setPlayerColor("white")
+            : setPlayerColor("black");
 
           break;
         case MOVE:
@@ -71,7 +87,9 @@ const Game = () => {
   return (
     <div className="w-[100vw] h-[100vh] bg-gray-900 ">
       <div className="text-white font-bold py-10 text-center text-3xl ">
-        {gameMetaData?.whitePlayerName} <span className="text-lg text-red-400">vs</span> {gameMetaData?.blackPlayerName}
+        {gameMetaData?.whitePlayer?.name}{" "}
+        <span className="text-lg text-red-400">vs</span>{" "}
+        {gameMetaData?.blackPlayer?.name}
       </div>
       <div className="flex mt-[8rem]">
         <div className="w-1/2 flex justify-end items-center">
