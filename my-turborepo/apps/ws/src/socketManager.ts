@@ -37,7 +37,7 @@ class SocketManager {
     return SocketManager.instance;
   }
 
-  addUser(user: User, roomId: string) {
+  addUser(user: User, roomId: string) { //here roomId refers to gameId don't get confused
     this.interestedSockets.set(roomId, [
       ...(this.interestedSockets.get(roomId) || []),
       user,
