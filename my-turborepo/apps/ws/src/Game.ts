@@ -4,9 +4,14 @@ import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { connect } from "http2";
-import { SocketAddress } from "net";
-import { log } from "console";
+
+type GAME_STATUS =
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "ABANDONED"
+  | "TIME_UP"
+  | "PLAYER_EXIT";
+type GAME_RESULT = "WHITE_WINS" | "BLACK_WINS" | "DRAW";
 
 interface moves {
   from: string;
@@ -21,6 +26,7 @@ export class Game {
   private lastMoveTime = new Date(Date.now());
   private moveCount = 0;
   private moves: moves[] = [];
+  public result: GAME_RESULT | null = null;
 
   constructor(
     player1UserId: string,
@@ -28,8 +34,8 @@ export class Game {
     gameId?: string,
     startTime?: Date
   ) {
-    this.gameId = gameId ?? randomUUID(),
-    this.player1UserId = player1UserId;
+    (this.gameId = gameId ?? randomUUID()),
+      (this.player1UserId = player1UserId);
     this.player2UserId = player2UserId;
     this.board = new Chess();
     if (startTime) {
@@ -42,7 +48,6 @@ export class Game {
     this.player2UserId = player2UserId;
     // console.log("Player 1",this.player1UserId);
     // console.log("Player 2",this.player2UserId);
-    
 
     const users = await db.user.findMany({
       where: {
@@ -52,7 +57,6 @@ export class Game {
       },
     });
     // console.log("users",users);
-    
 
     //add db call here
     try {
@@ -91,86 +95,6 @@ export class Game {
     );
   }
 
-  // makeMove(
-  //   socket: WebSocket,
-  //   move: {
-  //     from: string;
-  //     to: string;
-  //   }
-  // ) {
-  //   // validate the type of move using zod
-  //   if (this.moveCount % 2 === 0 && socket !== this.player1) {
-  //     return;
-  //   }
-  //   if (this.moveCount % 2 === 1 && socket !== this.player2) {
-  //     return;
-  //   }
-
-  //   try {
-  //     this.board.move(move);
-  //     this.moves.push({
-  //       from: move.from,
-  //       to: move.to,
-  //     });
-  //   } catch (e) {
-  //     console.log(e);
-  //     return;
-  //   }
-
-  //   if (this.moveCount % 2 === 0) {
-  //     this.player2?.send(
-  //       JSON.stringify({
-  //         type: MOVE,
-  //         payload: { move, totalMoves: this.moves },
-  //       })
-  //     );
-
-  //     this.player1.send(
-  //       JSON.stringify({
-  //         type: MOVE,
-  //         payload: { totalMoves: this.moves },
-  //       })
-  //     );
-  //   } else {
-  //     this.player1.send(
-  //       JSON.stringify({
-  //         type: MOVE,
-  //         payload: { move, totalMoves: this.moves },
-  //       })
-  //     );
-  //     this.player2?.send(
-  //       JSON.stringify({
-  //         type: MOVE,
-  //         payload: { totalMoves: this.moves },
-  //       })
-  //     );
-  //   }
-
-  //   if (this.board.isGameOver()) {
-  //     // Send the game over message to both players
-
-  //     this.player1.send(
-  //       JSON.stringify({
-  //         type: GAME_OVER,
-  //         payload: {
-  //           winner: this.board.turn() === "w" ? "black" : "white",
-  //         },
-  //       })
-  //     );
-  //     this.player2?.send(
-  //       JSON.stringify({
-  //         type: GAME_OVER,
-  //         payload: {
-  //           winner: this.board.turn() === "w" ? "black" : "white",
-  //         },
-  //       })
-  //     );
-  //     return;
-  //   }
-
-  //   this.moveCount++;
-  // }
-
   async createGameInDb() {
     this.startTime = new Date(Date.now());
     this.lastMoveTime = this.startTime;
@@ -199,5 +123,88 @@ export class Game {
       },
     });
     this.gameId = game.id;
+  }
+
+  async makeMove(
+    user: User,
+    move: {
+      from: string;
+      to: string;
+    }
+  ) {
+    // validate the type of move using zod
+    if (this.board.turn() === "w" && user.userId !== this.player1UserId) {
+      return;
+    }
+    if (this.board.turn() === "b" && user.userId !== this.player2UserId) {
+      return;
+    }
+    if (this.result) {
+      //why we use this find it
+      console.error(
+        `User ${user.userId} is making a move post game completion`
+      );
+      return;
+    }
+
+    try {
+      this.board.move(move);
+      this.moves.push({
+        from: move.from,
+        to: move.to,
+      });
+      await this.addMoveToDb(move);
+    } catch (e) {
+      console.log(e);
+      return;
+    }
+
+    socketManager.broadcast(
+      this.gameId,
+      JSON.stringify({
+        type: MOVE,
+        payload: { move , userId:user.userId },
+      })
+    );
+
+    if (this.board.isGameOver()) {
+      // Send the game over message to both players
+
+      socketManager.broadcast(
+        this.gameId,
+        JSON.stringify({
+          type: GAME_OVER,
+          payload: {
+            winner: this.board.turn() === "w" ? "black" : "white",
+          },
+        })
+      );
+
+      return;
+    }
+
+    this.moveCount++;
+  }
+
+  async addMoveToDb(move: { from: string; to: string }) {
+    try {
+      await db.$transaction([
+        db.move.create({
+          data: {
+            gameId: this.gameId,
+            moveNumber: this.moveCount + 1,
+            from: move.from,
+            to: move.to,
+            before: "hehe",
+            after: "haha",
+            createdAt: new Date(Date.now()),
+            timeTaken: 23,
+            san: "meow meow",
+          },
+        }),
+      ]);
+    } catch (error) {
+      console.error("this errror occured in Game/addMoveToDb", error);
+    }
   }
 }
