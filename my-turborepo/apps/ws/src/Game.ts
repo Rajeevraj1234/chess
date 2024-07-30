@@ -27,6 +27,8 @@ export class Game {
   private moveCount = 0;
   private moves: moves[] = [];
   public result: GAME_RESULT | null = null;
+  private player1TimeConsumed = 0;
+  private player2TimeConsumed = 0;
 
   constructor(
     player1UserId: string,
@@ -147,17 +149,33 @@ export class Game {
       return;
     }
 
+    const moveTimeStamp = new Date(Date.now());
+
     try {
       this.board.move(move);
       this.moves.push({
         from: move.from,
         to: move.to,
       });
-      await this.addMoveToDb(move);
+      
     } catch (e) {
       console.log(e);
       return;
     }
+
+    if(this.board.turn() === 'b'){
+      this.player1TimeConsumed += moveTimeStamp.getTime() - this.lastMoveTime.getTime(); 
+    }
+    if(this.board.turn() === 'w'){
+      this.player2TimeConsumed += moveTimeStamp.getTime() - this.lastMoveTime.getTime(); 
+    }
+
+    //add move to database
+    await this.addMoveToDb(move,moveTimeStamp);
+
+    this.lastMoveTime = moveTimeStamp;
+
+
 
     socketManager.broadcast(
       this.gameId,
@@ -186,7 +204,7 @@ export class Game {
     this.moveCount++;
   }
 
-  async addMoveToDb(move: { from: string; to: string }) {
+  async addMoveToDb(move: { from: string; to: string } , moveTimeStamp:Date) {
     try {
       await db.$transaction([
         db.move.create({
@@ -197,8 +215,8 @@ export class Game {
             to: move.to,
             before: "hehe",
             after: "haha",
-            createdAt: new Date(Date.now()),
-            timeTaken: 23,
+            createdAt: moveTimeStamp,
+            timeTaken: moveTimeStamp.getTime() - this.lastMoveTime.getTime(),
             san: "meow meow",
           },
         }),
