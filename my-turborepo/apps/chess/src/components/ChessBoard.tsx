@@ -8,6 +8,7 @@ const ChessBoard = ({
   chess,
   setBoard,
   playerColor,
+  gameId,
 }: {
   board: ({
     square: Square;
@@ -18,6 +19,7 @@ const ChessBoard = ({
   chess: any;
   setBoard: any;
   playerColor: string;
+  gameId:string | null,
 }) => {
   const [from, setFrom] = useState<null | Square>(null);
 
@@ -53,6 +55,7 @@ const ChessBoard = ({
                               from,
                               to: squareRepresention,
                             },
+                            gameId:gameId
                           },
                         })
                       );

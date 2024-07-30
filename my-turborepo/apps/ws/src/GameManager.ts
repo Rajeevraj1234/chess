@@ -60,14 +60,20 @@ export class GameManager {
         }
       }
 
-      // if (message.type === MOVE) {
-      //   const game = this.game.find(
-      //     (game) => game.player1 === user.socket || game.player2 === user.socket
-      //   );
-      //   if (game) {
-      //     game.makeMove(user.socket, message.payload.move);
-      //   }
-      // }
+      if (message.type === MOVE) {
+        const game = this.games.find((game)=>game.gameId === message.payload.gameId);
+        if(game){
+          game.makeMove(user,message.payload.move);
+          if(game.result){
+            this.removeGame(game.gameId);
+          }
+        }
+
+      }
     });
   }
+  removeGame(gameId:string){
+    this.games = this.games.filter((game)=> game.gameId !== gameId);
+  }
+
 }

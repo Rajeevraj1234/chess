@@ -16,6 +16,7 @@ interface moves {
 }
 
 export interface gameMetaDataInterface {
+  gameId:string,
   whitePlayer: {
     name: string;
     id: string;
@@ -54,6 +55,7 @@ const Game = () => {
           setStarted(true);
           // setPlayerColor(message.payload.color);
           setGameMetaData({
+            gameId:message.payload.gameId,
             whitePlayer: message.payload.WhitePlayer,
             blackPlayer: message.payload.BlackPlayer,
           });
@@ -66,8 +68,10 @@ const Game = () => {
         case MOVE:
           if (message.payload.move) {
             const move = message.payload.move;
-            chess.move(move);
-            setBoard(chess.board());
+            if(user.id !== message.payload.userId){
+              chess.move(move);
+              setBoard(chess.board());
+            }
           }
           setTotalMovesPlayed(message.payload.totalMoves);
           console.log("Move made");
@@ -99,6 +103,7 @@ const Game = () => {
             setBoard={setBoard}
             board={board}
             socket={socket}
+            gameId={gameMetaData?.gameId ?? null}
           />
         </div>
         <div className="w-1/2 flex flex-col justify-center items-center">
@@ -123,7 +128,7 @@ const Game = () => {
               </div>
             )}
             <div>
-              {totalMovesPlayed.map((move) => {
+              {totalMovesPlayed?.map((move) => {
                 return (
                   <div className="flex text-white gap-10">
                     <span>{move.from}</span>
