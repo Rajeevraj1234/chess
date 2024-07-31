@@ -1,9 +1,10 @@
 import { WebSocket } from "ws";
-import { Chess } from "chess.js";
+import { Chess , Move } from "chess.js";
 import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
 import { db } from "./db";
+import { log } from "console";
 
 type GAME_STATUS =
   | "IN_PROGRESS"
@@ -129,10 +130,7 @@ export class Game {
 
   async makeMove(
     user: User,
-    move: {
-      from: string;
-      to: string;
-    }
+    move: Move
   ) {
     // validate the type of move using zod
     if (this.board.turn() === "w" && user.userId !== this.player1UserId) {
@@ -181,7 +179,7 @@ export class Game {
       this.gameId,
       JSON.stringify({
         type: MOVE,
-        payload: { move , userId:user.userId },
+        payload: { move , userId:user.userId , totalMoves:this.moves},
       })
     );
 
@@ -204,7 +202,13 @@ export class Game {
     this.moveCount++;
   }
 
-  async addMoveToDb(move: { from: string; to: string } , moveTimeStamp:Date) {
+  async addMoveToDb(move:Move , moveTimeStamp:Date) {
+    const newBoard = JSON.parse(JSON.stringify(this.board));
+    const fen = Object.keys(newBoard._positionCount);
+    // console.log("before",fen[fen.length - 2]);
+    // console.log("after",fen[fen.length - 1]);
+    
+    
     try {
       await db.$transaction([
         db.move.create({
@@ -213,13 +217,21 @@ export class Game {
             moveNumber: this.moveCount + 1,
             from: move.from,
             to: move.to,
-            before: "hehe",
-            after: "haha",
+            before: fen[fen.length - 2],
+            after:fen[fen.length - 1],
             createdAt: moveTimeStamp,
             timeTaken: moveTimeStamp.getTime() - this.lastMoveTime.getTime(),
             san: "meow meow",
           },
         }),
+        db.game.update({
+          data:{
+            currentFen:fen[fen.length - 1],
+          },
+          where:{
+            id:this.gameId
+          }
+        })
       ]);
     } catch (error) {
       console.error("this errror occured in Game/addMoveToDb", error);

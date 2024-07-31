@@ -87,7 +87,7 @@ const Game = () => {
   if (!socket) {
     return <div>Connecting ...</div>;
   }
-
+  
   return (
     <div className="w-[100vw] h-[100vh] bg-gray-900 ">
       <div className="text-white font-bold py-10 text-center text-3xl ">
@@ -128,9 +128,9 @@ const Game = () => {
               </div>
             )}
             <div>
-              {totalMovesPlayed?.map((move) => {
+              {totalMovesPlayed?.map((move,index) => {
                 return (
-                  <div className="flex text-white gap-10">
+                  <div key={index} className="flex text-white gap-10">
                     <span>{move.from}</span>
                     <span>{move.to}</span>
                   </div>

@@ -1,4 +1,4 @@
-import { Color, PieceSymbol, Square } from "chess.js";
+import { Color, PieceSymbol, Square, Move } from "chess.js";
 import { useState } from "react";
 import { MOVE } from "../screens/Game";
 
@@ -19,11 +19,15 @@ const ChessBoard = ({
   chess: any;
   setBoard: any;
   playerColor: string;
-  gameId:string | null,
+  gameId: string | null;
 }) => {
   const [from, setFrom] = useState<null | Square>(null);
+  const [suggestionMove, setSuggestionMove] = useState([]);
 
-  // console.log(board);
+  // console.log("before",chess._p);
+
+  // console.log("before",chess._positionCount);
+  // console.log("after",chess._positionCount);
 
   // function handleMoveClick(square: Square) {}
   return (
@@ -46,7 +50,12 @@ const ChessBoard = ({
                   onClick={() => {
                     if (!from) {
                       setFrom(squareRepresention);
+                      setSuggestionMove(
+                        chess.moves({ square: squareRepresention })
+                      );
+                      console.log(chess.moves({ square: squareRepresention }));
                     } else {
+                      setSuggestionMove([]);
                       socket.send(
                         JSON.stringify({
                           type: MOVE,
@@ -55,7 +64,7 @@ const ChessBoard = ({
                               from,
                               to: squareRepresention,
                             },
-                            gameId:gameId
+                            gameId: gameId,
                           },
                         })
                       );
@@ -68,24 +77,40 @@ const ChessBoard = ({
                     }
                   }}
                   key={j}
-                  className={`w-16 h-16 text-black ${
+                  className={`w-16 h-16 text-black relative ${
                     (i + j) % 2 === 0 ? "bg-green-500" : "bg-green-100"
                   }`}
                 >
+                  {/* //her i am adding the suggestion thing where i take the suggestionMove from the chess.move({square:e4}) */}
+                  {/* then here i am iterating ovet that and if the lenght is 3 or greatere then i short it to 2 eg: Ne3 to e3  */}
+                  {suggestionMove?.map((move:string) => {
+                    if (move.length >= 3) {
+                      move = move.substring(1);
+                    }
+                    if (move === squareRepresention)
+                      return (
+                        <span className="absolute top-6 left-6 z-[1] h-4 w-4 bg-gray-500 rounded-full">
+                        </span>
+                      );
+                    return null;
+                  })}
+
                   <div
                     className={`flex justify-center items-center w-full h-full ${
                       playerColor === "black" ? "rotate-180" : ""
                     }`}
                   >
                     {square ? (
-                      <img
-                        className="w-16"
-                        src={`/${
-                          square?.color === "b"
-                            ? square?.type
-                            : `${square?.type?.toUpperCase()} copy`
-                        }.png`}
-                      />
+                      <div className="z-[2]">
+                        <img
+                          className="w-16"
+                          src={`/${
+                            square?.color === "b"
+                              ? square?.type
+                              : `${square?.type?.toUpperCase()} copy`
+                          }.png`}
+                        />
+                      </div>
                     ) : null}
                   </div>
                 </div>
