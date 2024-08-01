@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { Chess , Move } from "chess.js";
+import { Chess, Move } from "chess.js";
 import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
@@ -128,10 +128,7 @@ export class Game {
     this.gameId = game.id;
   }
 
-  async makeMove(
-    user: User,
-    move: Move
-  ) {
+  async makeMove(user: User, move: Move) {
     // validate the type of move using zod
     if (this.board.turn() === "w" && user.userId !== this.player1UserId) {
       return;
@@ -155,31 +152,36 @@ export class Game {
         from: move.from,
         to: move.to,
       });
-      
     } catch (e) {
       console.log(e);
       return;
     }
 
-    if(this.board.turn() === 'b'){
-      this.player1TimeConsumed += moveTimeStamp.getTime() - this.lastMoveTime.getTime(); 
+    if (this.board.turn() === "b") {
+      this.player1TimeConsumed +=
+        moveTimeStamp.getTime() - this.lastMoveTime.getTime();
     }
-    if(this.board.turn() === 'w'){
-      this.player2TimeConsumed += moveTimeStamp.getTime() - this.lastMoveTime.getTime(); 
+    if (this.board.turn() === "w") {
+      this.player2TimeConsumed +=
+        moveTimeStamp.getTime() - this.lastMoveTime.getTime();
     }
 
     //add move to database
-    await this.addMoveToDb(move,moveTimeStamp);
+    await this.addMoveToDb(move, moveTimeStamp);
 
     this.lastMoveTime = moveTimeStamp;
-
-
 
     socketManager.broadcast(
       this.gameId,
       JSON.stringify({
         type: MOVE,
-        payload: { move , userId:user.userId , totalMoves:this.moves},
+        payload: {
+          move,
+          userId: user.userId,
+          totalMoves: this.moves,
+          player1TimeConsumed: this.player1TimeConsumed,
+          player2TimeConsumed: this.player2TimeConsumed,
+        },
       })
     );
 
@@ -202,13 +204,10 @@ export class Game {
     this.moveCount++;
   }
 
-  async addMoveToDb(move:Move , moveTimeStamp:Date) {
+  async addMoveToDb(move: Move, moveTimeStamp: Date) {
     const newBoard = JSON.parse(JSON.stringify(this.board));
     const fen = Object.keys(newBoard._positionCount);
-    // console.log("before",fen[fen.length - 2]);
-    // console.log("after",fen[fen.length - 1]);
-    
-    
+
     try {
       await db.$transaction([
         db.move.create({
@@ -218,20 +217,20 @@ export class Game {
             from: move.from,
             to: move.to,
             before: fen[fen.length - 2],
-            after:fen[fen.length - 1],
+            after: fen[fen.length - 1],
             createdAt: moveTimeStamp,
             timeTaken: moveTimeStamp.getTime() - this.lastMoveTime.getTime(),
             san: "meow meow",
           },
         }),
         db.game.update({
-          data:{
-            currentFen:fen[fen.length - 1],
+          data: {
+            currentFen: fen[fen.length - 1],
           },
-          where:{
-            id:this.gameId
-          }
-        })
+          where: {
+            id: this.gameId,
+          },
+        }),
       ]);
     } catch (error) {
       console.error("this errror occured in Game/addMoveToDb", error);

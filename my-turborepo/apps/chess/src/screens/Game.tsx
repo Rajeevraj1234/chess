@@ -3,6 +3,7 @@ import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { Chess } from "chess.js";
 import { useUser } from "@repo/store/useUser";
+import { time } from "console";
 // import { Button } from "@repo/ui/button";
 
 // Constants
@@ -15,8 +16,10 @@ interface moves {
   to: string;
 }
 
+const CLASSIC_GAME_TIME_ms = 10 * 60 * 1000;
+
 export interface gameMetaDataInterface {
-  gameId:string,
+  gameId: string;
   whitePlayer: {
     name: string;
     id: string;
@@ -40,6 +43,8 @@ const Game = () => {
   const [playerColor, setPlayerColor] = useState<string>("");
   const [isWinner, setIsWinner] = useState(false);
   const [totalMovesPlayed, setTotalMovesPlayed] = useState<moves[]>([]);
+  const [player1TimeConsumed, setPlayer1TimeConsumed] = useState();
+  const [player2TimeConsumed, setPlayer2TimeConsumed] = useState();
 
   useEffect(() => {
     if (!socket) {
@@ -55,11 +60,11 @@ const Game = () => {
           setStarted(true);
           // setPlayerColor(message.payload.color);
           setGameMetaData({
-            gameId:message.payload.gameId,
+            gameId: message.payload.gameId,
             whitePlayer: message.payload.WhitePlayer,
             blackPlayer: message.payload.BlackPlayer,
           });
-          
+
           user.id === message.payload.WhitePlayer.id
             ? setPlayerColor("white")
             : setPlayerColor("black");
@@ -68,7 +73,9 @@ const Game = () => {
         case MOVE:
           if (message.payload.move) {
             const move = message.payload.move;
-            if(user.id !== message.payload.userId){
+            setPlayer1TimeConsumed(message.payload.player1TimeConsumed);
+            setPlayer2TimeConsumed(message.payload.player2TimeConsumed);
+            if (user.id !== message.payload.userId) {
               chess.move(move);
               setBoard(chess.board());
             }
@@ -87,7 +94,21 @@ const Game = () => {
   if (!socket) {
     return <div>Connecting ...</div>;
   }
-  
+
+  function getTimer(timeRemaining: number | undefined) {
+    const leftTime = timeRemaining ?? 0;
+    const remainingTime = CLASSIC_GAME_TIME_ms - leftTime;
+    const second = Math.floor(remainingTime / 1000);
+    const minute = second / 60;
+    const displayTime = minute.toFixed(2).toString().replace(".", ":");
+
+    return (
+      <div className="text-white flex w-[120px]">
+        <span>{displayTime}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="w-[100vw] h-[100vh] bg-gray-900 ">
       <div className="text-white font-bold py-10 text-center text-3xl ">
@@ -106,37 +127,53 @@ const Game = () => {
             gameId={gameMetaData?.gameId ?? null}
           />
         </div>
+        <div className="flex flex-col justify-between "></div>
         <div className="w-1/2 flex flex-col justify-center items-center">
-          <div className="bg-gray-800 h-[500px] w-[400px] flex flex-col justify-start items-center">
+          <div className="bg-gray-800 h-full w-[400px] flex flex-col justify-start items-center">
             {!started && (
-              <button
-                onClick={() => {
-                  socket.send(
-                    JSON.stringify({
-                      type: INIT_GAME,
-                    })
-                  );
-                }}
-                className="px-16 py-4 mt-10 text-lg bg-green-500 font-bold rounded-md"
-              >
-                Play
-              </button>
-            )}
-            {isWinner && (
-              <div className="text-white font-bold text-lg">
-                {chess.turn() === "w" ? "Black wins" : "White wins"}
+              <div className=" h-full w-full flex flex-col justify-start items-center bg-green-200">
+                <button
+                  onClick={() => {
+                    socket.send(
+                      JSON.stringify({
+                        type: INIT_GAME,
+                      })
+                    );
+                  }}
+                  className="px-16 py-4 mt-10 text-lg bg-green-500 font-bold rounded-md"
+                >
+                  Play
+                </button>
+
+                {isWinner && (
+                  <div className="text-white font-bold text-lg">
+                    {chess.turn() === "w" ? "Black wins" : "White wins"}
+                  </div>
+                )}
               </div>
             )}
-            <div>
-              {totalMovesPlayed?.map((move,index) => {
-                return (
-                  <div key={index} className="flex text-white gap-10">
-                    <span>{move.from}</span>
-                    <span>{move.to}</span>
-                  </div>
-                );
-              })}
-            </div>
+            {started && (
+              <div className="h-full w-full overflow-y-scroll">
+                <div className="w-full">
+                  <span className="flex gap-3 text-white">White Player Time Left: {getTimer(player1TimeConsumed)}</span>
+                  <span className="flex gap-3 text-white">Black Player Time Left:{getTimer(player2TimeConsumed)}</span>
+                </div>
+                <div className="text-white ">
+                  Current Turn: {chess.turn() === 'b' ? "black" : "white"}
+                </div>
+                <div>
+                  <div className="my-5 text-white font-bold text-xl">MOVES PLAYED</div>
+                  {totalMovesPlayed?.map((move, index) => {
+                    return (
+                      <div key={index} className="flex text-white gap-10">
+                        <span>{move.from}</span>
+                        <span>{move.to}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
