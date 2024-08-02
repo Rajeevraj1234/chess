@@ -4,7 +4,10 @@ import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { log } from "console";
+import { createClient } from "redis";
+
+const client = createClient();
+client.on('error', (err) => console.log('Redis Client Error', err));
 
 type GAME_STATUS =
   | "IN_PROGRESS"
@@ -168,6 +171,7 @@ export class Game {
 
     //add move to database
     await this.addMoveToDb(move, moveTimeStamp);
+    await this.pushToQueue("hello there");
 
     this.lastMoveTime = moveTimeStamp;
 
@@ -235,5 +239,9 @@ export class Game {
     } catch (error) {
       console.error("this errror occured in Game/addMoveToDb", error);
     }
+  }
+  async pushToQueue(data:string) {
+    await client.lPush('newData', JSON.stringify(data));
+    console.log('Data pushed to queue:', data);
   }
 }

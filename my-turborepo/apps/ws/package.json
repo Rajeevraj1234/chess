@@ -11,10 +11,12 @@
   "description": "",
   "dependencies": {
     "@repo/db": "*",
+    "@repo/redis_queue": "*",
     "@repo/ui": "*",
     "@types/ws": "^8.5.10",
     "chess.js": "^1.0.0-beta.8",
     "nodemon": "^3.1.4",
+    "redis": "^4.7.0",
     "url": "^0.11.3",
     "ws": "^8.17.1"
   },
