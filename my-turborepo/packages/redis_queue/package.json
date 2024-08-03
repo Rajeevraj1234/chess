@@ -1,0 +1,15 @@
+{
+  "name": "@repo/redis_queue",
+  "version": "1.0.0",
+  "main": "index.js",
+  "exports": {
+    "./client": "./src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "redis": "^4.7.0"
+  }
+}

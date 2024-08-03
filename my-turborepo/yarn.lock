@@ -443,6 +443,40 @@
   dependencies:
     "@prisma/debug" "5.15.1"
 
+"@redis/bloom@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/@redis/bloom/-/bloom-1.2.0.tgz"
+  integrity sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg==
+
+"@redis/client@^1.0.0", "@redis/client@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.npmjs.org/@redis/client/-/client-1.6.0.tgz"
+  integrity sha512-aR0uffYI700OEEH4gYnitAnv3vzVGXCFvYfdpu/CJKvk4pHfLPEy/JSZyrpQ+15WhXe1yJRXLtfQ84s4mEXnPg==
+  dependencies:
+    cluster-key-slot "1.1.2"
+    generic-pool "3.9.0"
+    yallist "4.0.0"
+
+"@redis/graph@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/@redis/graph/-/graph-1.1.1.tgz"
+  integrity sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw==
+
+"@redis/json@1.0.7":
+  version "1.0.7"
+  resolved "https://registry.npmjs.org/@redis/json/-/json-1.0.7.tgz"
+  integrity sha512-6UyXfjVaTBTJtKNG4/9Z8PSpKE6XgSyEb8iwaqDcy+uKrd/DGYHTWkUdnQDyzm727V7p21WUMhsqz5oy65kPcQ==
+
+"@redis/search@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/@redis/search/-/search-1.2.0.tgz"
+  integrity sha512-tYoDBbtqOVigEDMAcTGsRlMycIIjwMCgD8eR2t0NANeQmgK/lvxNAvYyb6bZDD4frHRhIHkJu2TBRvB0ERkOmw==
+
+"@redis/time-series@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/@redis/time-series/-/time-series-1.1.0.tgz"
+  integrity sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g==
+
 "@remix-run/router@1.16.1":
   version "1.16.1"
   resolved "https://registry.npmjs.org/@remix-run/router/-/router-1.16.1.tgz"
@@ -457,6 +491,12 @@
 "@repo/eslint-config@*", "@repo/eslint-config@file:/home/rajeev/ramping-project/chess/my-turborepo/packages/eslint-config":
   version "0.0.0"
   resolved "file:packages/eslint-config"
+
+"@repo/redis_queue@*", "@repo/redis_queue@file:/home/rajeev/ramping-project/chess/my-turborepo/packages/redis_queue":
+  version "1.0.0"
+  resolved "file:packages/redis_queue"
+  dependencies:
+    redis "^4.7.0"
 
 "@repo/store@file:/home/rajeev/ramping-project/chess/my-turborepo/packages/store":
   version "1.0.0"
@@ -1585,6 +1625,7 @@ chess.js@^1.0.0-beta.8:
     react "^18.3.1"
     react-dom "^18.3.1"
     react-router-dom "^6.23.1"
+    recoil "^0.7.7"
 
 chokidar@^3.5.2, chokidar@^3.5.3:
   version "3.6.0"
@@ -1639,6 +1680,11 @@ clone@^1.0.2:
   version "1.0.4"
   resolved "https://registry.npmjs.org/clone/-/clone-1.0.4.tgz"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
+
+cluster-key-slot@1.1.2:
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.2.tgz"
+  integrity sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==
 
 color-convert@^1.9.0:
   version "1.9.3"
@@ -2805,6 +2851,11 @@ functions-have-names@^1.2.3:
   version "1.2.3"
   resolved "https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
+
+generic-pool@3.9.0:
+  version "3.9.0"
+  resolved "https://registry.npmjs.org/generic-pool/-/generic-pool-3.9.0.tgz"
+  integrity sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -4664,6 +4715,18 @@ recoil@^0.7.7:
   dependencies:
     hamt_plus "1.0.2"
 
+redis@^4.7.0:
+  version "4.7.0"
+  resolved "https://registry.npmjs.org/redis/-/redis-4.7.0.tgz"
+  integrity sha512-zvmkHEAdGMn+hMRXuMBtu4Vo5P6rHQjLoHftu+lBqq8ZTA3RCVC/WzD790bkKKiNFp7d5/9PcSD19fJyyRvOdQ==
+  dependencies:
+    "@redis/bloom" "1.2.0"
+    "@redis/client" "1.6.0"
+    "@redis/graph" "1.1.1"
+    "@redis/json" "1.0.7"
+    "@redis/search" "1.2.0"
+    "@redis/time-series" "1.1.0"
+
 reflect.getprototypeof@^1.0.4:
   version "1.0.6"
   resolved "https://registry.npmjs.org/reflect.getprototypeof/-/reflect.getprototypeof-1.0.6.tgz"
@@ -5806,6 +5869,7 @@ ws@^8.17.1:
   resolved "file:apps/ws"
   dependencies:
     "@repo/db" "*"
+    "@repo/redis_queue" "*"
     "@repo/ui" "*"
     "@types/ws" "^8.5.10"
     chess.js "^1.0.0-beta.8"
@@ -5817,6 +5881,11 @@ yallist@^3.0.2:
   version "3.1.1"
   resolved "https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz"
   integrity sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==
+
+yallist@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz"
+  integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
 yaml@^2.3.4:
   version "2.4.5"

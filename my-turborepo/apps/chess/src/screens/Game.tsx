@@ -3,8 +3,6 @@ import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { Chess } from "chess.js";
 import { useUser } from "@repo/store/useUser";
-import { time } from "console";
-// import { Button } from "@repo/ui/button";
 
 // Constants
 export const INIT_GAME = "init_game";
@@ -113,7 +111,7 @@ const Game = () => {
     <div className="w-[100vw] h-[100vh] bg-gray-900 ">
       <div className="text-white font-bold py-10 text-center text-3xl ">
         {gameMetaData?.whitePlayer?.name}{" "}
-        <span className="text-lg text-red-400">vs</span>{" "}
+        {started && <span className="text-lg text-red-400">vs</span>}{" "}
         {gameMetaData?.blackPlayer?.name}
       </div>
       <div className="flex mt-[8rem]">
@@ -127,9 +125,8 @@ const Game = () => {
             gameId={gameMetaData?.gameId ?? null}
           />
         </div>
-        <div className="flex flex-col justify-between "></div>
         <div className="w-1/2 flex flex-col justify-center items-center">
-          <div className="bg-gray-800 h-full w-[400px] flex flex-col justify-start items-center">
+          <div className="bg-gray-800 h-full w-[400px] flex flex-col justify-start items-center p-2">
             {!started && (
               <div className=" h-full w-full flex flex-col justify-start items-center bg-green-200">
                 <button
@@ -144,25 +141,32 @@ const Game = () => {
                 >
                   Play
                 </button>
-
-                {isWinner && (
-                  <div className="text-white font-bold text-lg">
-                    {chess.turn() === "w" ? "Black wins" : "White wins"}
-                  </div>
-                )}
               </div>
             )}
             {started && (
               <div className="h-full w-full overflow-y-scroll">
                 <div className="w-full">
-                  <span className="flex gap-3 text-white">White Player Time Left: {getTimer(player1TimeConsumed)}</span>
-                  <span className="flex gap-3 text-white">Black Player Time Left:{getTimer(player2TimeConsumed)}</span>
+                  <span className="flex gap-3 text-white">
+                    White Player Time Left: {getTimer(player1TimeConsumed)}
+                  </span>
+                  <span className="flex gap-3 text-white">
+                    Black Player Time Left:{getTimer(player2TimeConsumed)}
+                  </span>
                 </div>
                 <div className="text-white ">
-                  Current Turn: {chess.turn() === 'b' ? "black" : "white"}
+                  Current Turn: {chess.turn() === "b" ? "black" : "white"}
                 </div>
                 <div>
-                  <div className="my-5 text-white font-bold text-xl">MOVES PLAYED</div>
+                  {isWinner && (
+                    <div className="text-white font-bold text-lg">
+                      {chess.turn() === "w" ? "Black wins" : "White wins"}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <div className="my-5 text-white font-bold text-xl">
+                    MOVES PLAYED
+                  </div>
                   {totalMovesPlayed?.map((move, index) => {
                     return (
                       <div key={index} className="flex text-white gap-10">

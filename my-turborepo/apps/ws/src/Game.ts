@@ -4,10 +4,9 @@ import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { createClient } from "redis";
+import client from "./redis"
 
-const client = createClient();
-client.on('error', (err) => console.log('Redis Client Error', err));
+// client.on('error', (err) => console.log('Redis Client Error', err));
 
 type GAME_STATUS =
   | "IN_PROGRESS"
@@ -171,7 +170,13 @@ export class Game {
 
     //add move to database
     await this.addMoveToDb(move, moveTimeStamp);
-    await this.pushToQueue("hello there");
+    const dataToSendRedis = {
+      gameId:this.gameId,
+      move:move,
+      moveTimeStamp:moveTimeStamp
+    }
+    await this.pushToQueue(JSON.stringify(dataToSendRedis));
+    await this.fetchDataFromQueue();
 
     this.lastMoveTime = moveTimeStamp;
 
@@ -240,8 +245,12 @@ export class Game {
       console.error("this errror occured in Game/addMoveToDb", error);
     }
   }
-  async pushToQueue(data:string) {
-    await client.lPush('newData', JSON.stringify(data));
-    console.log('Data pushed to queue:', data);
+  async pushToQueue(data: string) {
+    await client.lPush("moveData", JSON.stringify(data));
+    console.log("Data pushed to queue:", data);
+  }
+  async fetchDataFromQueue() {
+    const data = await client.brPop("moveData", 0);
+    console.log("Retrived data ", JSON.parse(data?.element || ""));
   }
 }
