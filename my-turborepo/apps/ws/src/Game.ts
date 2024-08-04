@@ -4,7 +4,8 @@ import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import client from "./redis"
+import RedisClient from "@repo/redis_queue/client";
+const client = RedisClient.getInstance();
 
 // client.on('error', (err) => console.log('Redis Client Error', err));
 
@@ -168,15 +169,8 @@ export class Game {
         moveTimeStamp.getTime() - this.lastMoveTime.getTime();
     }
 
-    //add move to database
-    await this.addMoveToDb(move, moveTimeStamp);
-    const dataToSendRedis = {
-      gameId:this.gameId,
-      move:move,
-      moveTimeStamp:moveTimeStamp
-    }
-    await this.pushToQueue(JSON.stringify(dataToSendRedis));
-    await this.fetchDataFromQueue();
+    //add move to redis queue
+    await this.addMoveToRedis(move, moveTimeStamp);
 
     this.lastMoveTime = moveTimeStamp;
 
@@ -213,44 +207,26 @@ export class Game {
     this.moveCount++;
   }
 
-  async addMoveToDb(move: Move, moveTimeStamp: Date) {
+  async addMoveToRedis(move: Move, moveTimeStamp: Date) {
     const newBoard = JSON.parse(JSON.stringify(this.board));
     const fen = Object.keys(newBoard._positionCount);
 
+    const moveData = {
+      gameId: this.gameId,
+      moveNumber: this.moveCount + 1,
+      from: move.from,
+      to: move.to,
+      before: fen[fen.length - 2],
+      after: fen[fen.length - 1],
+      createdAt: moveTimeStamp,
+      timeTaken: moveTimeStamp.getTime() - this.lastMoveTime.getTime(),
+      san: "meow meow",
+    };
+
     try {
-      await db.$transaction([
-        db.move.create({
-          data: {
-            gameId: this.gameId,
-            moveNumber: this.moveCount + 1,
-            from: move.from,
-            to: move.to,
-            before: fen[fen.length - 2],
-            after: fen[fen.length - 1],
-            createdAt: moveTimeStamp,
-            timeTaken: moveTimeStamp.getTime() - this.lastMoveTime.getTime(),
-            san: "meow meow",
-          },
-        }),
-        db.game.update({
-          data: {
-            currentFen: fen[fen.length - 1],
-          },
-          where: {
-            id: this.gameId,
-          },
-        }),
-      ]);
+      await client.lPush("moveData", JSON.stringify(moveData));
     } catch (error) {
-      console.error("this errror occured in Game/addMoveToDb", error);
+      console.error("this errror occured in Game/addMoveToRedis", error);
     }
-  }
-  async pushToQueue(data: string) {
-    await client.lPush("moveData", JSON.stringify(data));
-    console.log("Data pushed to queue:", data);
-  }
-  async fetchDataFromQueue() {
-    const data = await client.brPop("moveData", 0);
-    console.log("Retrived data ", JSON.parse(data?.element || ""));
   }
 }

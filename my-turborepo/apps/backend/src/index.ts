@@ -6,12 +6,11 @@ import dotenv from "dotenv";
 import session from "express-session";
 import { initPassport } from "./passport";
 import passport from "passport";
+import initRedis from "./redis_worker/index"
 
 
 dotenv.config();
 const app = express();
-
-
 
 //session middleware
 app.use(
@@ -22,6 +21,9 @@ app.use(
     cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 },
   })
 );
+
+//redis worker
+initRedis();
 
 //passpost middleware
 initPassport();
@@ -41,7 +43,7 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   res.json({
     message: "welcome to this chess backend",
   });

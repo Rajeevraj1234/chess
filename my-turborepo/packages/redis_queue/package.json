@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "exports": {
-    "./client": "./src/index.ts"
+    "./client": "./dist/index.js"
   },
   "keywords": [],
   "author": "",

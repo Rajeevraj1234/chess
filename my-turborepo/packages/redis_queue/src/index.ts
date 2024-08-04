@@ -1,8 +1,17 @@
-import redis from 'redis'
+import { createClient, RedisClientType } from "redis";
 
-const redisClient = redis.createClient();
+class RedisClient {
+  private static instance: RedisClientType | null = null;
 
+  private constructor() {}
 
-redisClient.connect();
+  public static getInstance(): RedisClientType {
+    if (!RedisClient.instance) {
+      RedisClient.instance = createClient();
+      RedisClient.instance.connect().catch(console.error);
+    }
+    return RedisClient.instance;
+  }
+}
 
-export default redisClient;
+export default RedisClient;

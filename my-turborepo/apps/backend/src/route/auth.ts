@@ -15,7 +15,7 @@ interface User {
 router.get("/refresh", async (req: Request, res: Response) => {
   if (req.user) {
     const user = req.user as User;
-    console.log(user);
+    // console.log(user);
     
 
     // Token is issued so it can be shared b/w HTTP and ws server
