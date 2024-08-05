@@ -9,13 +9,13 @@ import { useUser } from "@repo/store/useUser";
 export const INIT_GAME = "init_game";
 export const GAME_OVER = "game_over";
 export const MOVE = "move";
+export const CLASSIC_GAME_TIME_ms = 10 * 60 * 1000;
 
 interface moves {
   from: string;
   to: string;
 }
 
-const CLASSIC_GAME_TIME_ms = 10 * 60 * 1000;
 
 export interface gameMetaDataInterface {
   gameId: string;
@@ -32,7 +32,7 @@ export interface gameMetaDataInterface {
 }
 
 const Game = () => {
-  const socket = useSocket();
+  const socket = useSocket();  
   const user = useUser();
   const [chess, _setChess] = useState(new Chess());
   const [board, setBoard] = useState(chess.board());
@@ -46,13 +46,11 @@ const Game = () => {
   const [player2TimeConsumed, setPlayer2TimeConsumed] = useState();
 
   useEffect(() => {
-    if (!socket) {
+    if (!socket) {  
       return;
     }
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      // console.log(message);
-
       switch (message.type) {
         case INIT_GAME:
           setBoard(chess.board());
