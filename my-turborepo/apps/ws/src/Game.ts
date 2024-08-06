@@ -190,13 +190,20 @@ export class Game {
 
     if (this.board.isGameOver()) {
       // Send the game over message to both players
+      if (this.board.isDraw()) {
+        this.result = "DRAW";
+      } else {
+        this.result = this.board.turn() === "w" ? "BLACK_WINS" : "WHITE_WINS";
+      }
+
+      await this.addResultToGame("COMPLETED");
 
       socketManager.broadcast(
         this.gameId,
         JSON.stringify({
           type: GAME_OVER,
           payload: {
-            winner: this.board.turn() === "w" ? "black" : "white",
+            winner:  this.board.turn() === "w" ? "BLACK_WINS" : "WHITE_WINS",
           },
         })
       );
@@ -228,5 +235,17 @@ export class Game {
     } catch (error) {
       console.error("this errror occured in Game/addMoveToRedis", error);
     }
+  }
+
+  async addResultToGame(gameStatus: GAME_STATUS) {
+    await db.game.update({
+      data: {
+        result: this.result,
+        status: gameStatus,
+      },
+      where: {
+        id: this.gameId,
+      },
+    });
   }
 }

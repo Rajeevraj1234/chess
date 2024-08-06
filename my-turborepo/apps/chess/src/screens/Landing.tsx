@@ -18,7 +18,7 @@ const Landing = () => {
       console.log("Logged out successfully");
       // Clear any client-side state or cookies here if needed
       // Optionally redirect after logging out
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }

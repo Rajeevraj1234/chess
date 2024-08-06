@@ -4,18 +4,17 @@ import { useSocket } from "../hooks/useSocket";
 import { Chess } from "chess.js";
 import { useUser } from "@repo/store/useUser";
 
-
 // Constants
 export const INIT_GAME = "init_game";
 export const GAME_OVER = "game_over";
 export const MOVE = "move";
 export const CLASSIC_GAME_TIME_ms = 10 * 60 * 1000;
+export type GAME_RESULT = "WHITE_WINS" | "BLACK_WINS" | "DRAW";
 
 interface moves {
   from: string;
   to: string;
 }
-
 
 export interface gameMetaDataInterface {
   gameId: string;
@@ -32,7 +31,7 @@ export interface gameMetaDataInterface {
 }
 
 const Game = () => {
-  const socket = useSocket();  
+  const socket = useSocket();
   const user = useUser();
   const [chess, _setChess] = useState(new Chess());
   const [board, setBoard] = useState(chess.board());
@@ -40,13 +39,13 @@ const Game = () => {
     useState<gameMetaDataInterface | null>(null);
   const [started, setStarted] = useState(false);
   const [playerColor, setPlayerColor] = useState<string>("");
-  const [isWinner, setIsWinner] = useState(false);
+  const [winner, setWinner] = useState<GAME_RESULT | null>(null);
   const [totalMovesPlayed, setTotalMovesPlayed] = useState<moves[]>([]);
   const [player1TimeConsumed, setPlayer1TimeConsumed] = useState();
   const [player2TimeConsumed, setPlayer2TimeConsumed] = useState();
 
   useEffect(() => {
-    if (!socket) {  
+    if (!socket) {
       return;
     }
     socket.onmessage = (event) => {
@@ -82,7 +81,7 @@ const Game = () => {
           break;
         case GAME_OVER:
           console.log("Game over");
-          setIsWinner(true);
+          setWinner(message.payload.winner);
           break;
       }
     };
@@ -114,7 +113,7 @@ const Game = () => {
         {gameMetaData?.blackPlayer?.name}
       </div>
       <div className="flex mt-[8rem]">
-        <div className="w-1/2 flex justify-end items-center">
+        <div className="w-1/2 flex justify-end items-center ">
           <ChessBoard
             playerColor={playerColor}
             chess={chess}
@@ -122,8 +121,10 @@ const Game = () => {
             board={board}
             socket={socket}
             gameId={gameMetaData?.gameId ?? null}
+            winner={winner}
           />
         </div>
+
         <div className="w-1/2 flex flex-col justify-center items-center">
           <div className="bg-gray-800 h-full w-[400px] flex flex-col justify-start items-center p-2">
             {!started && (
@@ -155,13 +156,7 @@ const Game = () => {
                 <div className="text-white ">
                   Current Turn: {chess.turn() === "b" ? "black" : "white"}
                 </div>
-                <div>
-                  {isWinner && (
-                    <div className="text-white font-bold text-lg">
-                      {chess.turn() === "w" ? "Black wins" : "White wins"}
-                    </div>
-                  )}
-                </div>
+
                 <div>
                   <div className="my-5 text-white font-bold text-xl">
                     MOVES PLAYED
