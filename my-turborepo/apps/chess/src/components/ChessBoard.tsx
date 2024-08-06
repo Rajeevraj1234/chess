@@ -57,13 +57,11 @@ const ChessBoard = ({
 
                 return (
                   <div
+                    key={j}
                     onClick={() => {
                       if (!from) {
                         setFrom(squareRepresention);
                         setSuggestionMove(
-                          chess.moves({ square: squareRepresention })
-                        );
-                        console.log(
                           chess.moves({ square: squareRepresention })
                         );
                       } else {
@@ -88,20 +86,19 @@ const ChessBoard = ({
                         setBoard(chess.board());
                       }
                     }}
-                    key={j}
                     className={`w-16 h-16 text-black relative ${
                       (i + j) % 2 === 0 ? "bg-green-500" : "bg-green-100"
                     }`}
                   >
                     {/* //her i am adding the suggestion thing where i take the suggestionMove from the chess.move({square:e4}) */}
                     {/* then here i am iterating ovet that and if the lenght is 3 or greatere then i short it to 2 eg: Ne3 to e3  */}
-                    {suggestionMove?.map((move: string) => {
+                    {suggestionMove?.map((move: string,index) => {
                       if (move.length >= 3) {
                         move = move.substring(1);
                       }
                       if (move === squareRepresention)
                         return (
-                          <span className="absolute top-6 left-6 z-[1] h-4 w-4 bg-gray-500 rounded-full"></span>
+                          <span key={index} className="absolute top-6 left-6 z-[1] h-4 w-4 bg-gray-500 rounded-full"></span>
                         );
                       return null;
                     })}

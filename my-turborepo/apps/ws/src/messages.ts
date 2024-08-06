@@ -9,6 +9,7 @@ export const GAME_JOINED = "game_joined";
 export const GAME_ENDED = "game_ended";
 export const GAME_ALERT = "game_alert";
 export const GAME_ADDED = "game_added";
+export const ABORT_GAME = "abort_game";
 export const GAME_TIME = "game_time";
 export const EXIT_GAME = "exit_game";
 export type GAME_STATUS = "IN_PROGRESS" | "COMPLETED" | "ABANDONED" | "TIME_UP" | "PLAYER_EXIT"

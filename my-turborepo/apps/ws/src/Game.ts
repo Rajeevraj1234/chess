@@ -1,10 +1,10 @@
-import { WebSocket } from "ws";
 import { Chess, Move } from "chess.js";
-import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
+import { ABORT_GAME, GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import RedisClient from "@repo/redis_queue/client";
+import { SocketAddress } from "net";
 const client = RedisClient.getInstance();
 
 // client.on('error', (err) => console.log('Redis Client Error', err));
@@ -203,7 +203,7 @@ export class Game {
         JSON.stringify({
           type: GAME_OVER,
           payload: {
-            winner:  this.board.turn() === "w" ? "BLACK_WINS" : "WHITE_WINS",
+            winner: this.board.turn() === "w" ? "BLACK_WINS" : "WHITE_WINS",
           },
         })
       );
@@ -247,5 +247,21 @@ export class Game {
         id: this.gameId,
       },
     });
+  }
+
+  async abortGame(user: User) {
+    this.result =
+      user.userId === this.player1UserId ? "BLACK_WINS" : "WHITE_WINS";
+    await this.addResultToGame("PLAYER_EXIT");
+
+    socketManager.broadcast(
+      this.gameId,
+      JSON.stringify({
+        type: ABORT_GAME,
+        payload: {
+          winner: this.result,
+        },
+      })
+    );
   }
 }

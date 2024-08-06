@@ -3,11 +3,13 @@ import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { Chess } from "chess.js";
 import { useUser } from "@repo/store/useUser";
+import { useNavigate } from "react-router-dom";
 
 // Constants
 export const INIT_GAME = "init_game";
 export const GAME_OVER = "game_over";
 export const MOVE = "move";
+export const ABORT_GAME = "abort_game";
 export const CLASSIC_GAME_TIME_ms = 10 * 60 * 1000;
 export type GAME_RESULT = "WHITE_WINS" | "BLACK_WINS" | "DRAW";
 
@@ -43,6 +45,7 @@ const Game = () => {
   const [totalMovesPlayed, setTotalMovesPlayed] = useState<moves[]>([]);
   const [player1TimeConsumed, setPlayer1TimeConsumed] = useState();
   const [player2TimeConsumed, setPlayer2TimeConsumed] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!socket) {
@@ -64,7 +67,7 @@ const Game = () => {
           user.id === message.payload.WhitePlayer.id
             ? setPlayerColor("white")
             : setPlayerColor("black");
-
+          
           break;
         case MOVE:
           if (message.payload.move) {
@@ -81,6 +84,9 @@ const Game = () => {
           break;
         case GAME_OVER:
           console.log("Game over");
+          setWinner(message.payload.winner);
+          break;
+        case ABORT_GAME:
           setWinner(message.payload.winner);
           break;
       }
@@ -125,10 +131,10 @@ const Game = () => {
           />
         </div>
 
-        <div className="w-1/2 flex flex-col justify-center items-center">
-          <div className="bg-gray-800 h-full w-[400px] flex flex-col justify-start items-center p-2">
+        <div className="w-1/2 flex flex-col justify-center items-center ">
+          <div className="bg-gray-800 h-[520px] w-[400px] flex flex-col justify-start items-center p-2 ">
             {!started && (
-              <div className=" h-full w-full flex flex-col justify-start items-center bg-green-200">
+              <div className=" h-full w-full flex flex-col justify-start items-center ">
                 <button
                   onClick={() => {
                     socket.send(
@@ -139,12 +145,12 @@ const Game = () => {
                   }}
                   className="px-16 py-4 mt-10 text-lg bg-green-500 font-bold rounded-md"
                 >
-                  Play
+                  Start
                 </button>
               </div>
             )}
             {started && (
-              <div className="h-full w-full overflow-y-scroll">
+              <div className="h-full w-full ">
                 <div className="w-full">
                   <span className="flex gap-3 text-white">
                     White Player Time Left: {getTimer(player1TimeConsumed)}
@@ -156,19 +162,42 @@ const Game = () => {
                 <div className="text-white ">
                   Current Turn: {chess.turn() === "b" ? "black" : "white"}
                 </div>
-
-                <div>
+                <div className="my-3">
+                  <div className="text-white flex gap-2 items-center">
+                    <span>Controlls:</span>{" "}
+                    <span
+                      className="border p-2 text-xs"
+                      onClick={() => {
+                        socket.send(
+                          JSON.stringify({
+                            type: ABORT_GAME,
+                            payload: {
+                              gameId: gameMetaData?.gameId,
+                            },
+                          })
+                        );
+                      }}
+                    >
+                      ABORT
+                    </span>{" "}
+                    <span className="border p-2 text-xs">DRAW</span>
+                  </div>
+                </div>
+                <div className=" h-[70%]">
                   <div className="my-5 text-white font-bold text-xl">
                     MOVES PLAYED
                   </div>
-                  {totalMovesPlayed?.map((move, index) => {
-                    return (
-                      <div key={index} className="flex text-white gap-10">
-                        <span>{move.from}</span>
-                        <span>{move.to}</span>
-                      </div>
-                    );
-                  })}
+                  <div className="overflow-y-scroll h-[90%]">
+                    {totalMovesPlayed?.map((move, index) => {
+                      return (
+                        <div key={index} className="flex text-white gap-7 ">
+                          <span>{index+1}.</span>
+                          <span>{move.from}</span>
+                          <span>{move.to}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}

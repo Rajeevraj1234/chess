@@ -49,7 +49,7 @@ const Login = () => {
           />
           <button
             className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300"
-            onClick={() => navigate("/game/random")}
+            onClick={() => navigate("/game")}
           >
             Enter as guest
           </button>

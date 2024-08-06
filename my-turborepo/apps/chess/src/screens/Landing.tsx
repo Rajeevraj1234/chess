@@ -37,7 +37,7 @@ const Landing = () => {
           {user ? (
             <div className="flex gap-5">
               <button
-                onClick={() => navigate("/game/random")}
+                onClick={() => navigate("/game")}
                 className="px-10 py-5 mt-10 text-sm bg-green-500 font-bold rounded-md"
               >
                 Play Online
