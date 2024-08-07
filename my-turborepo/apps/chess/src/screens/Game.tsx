@@ -3,7 +3,6 @@ import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { Chess } from "chess.js";
 import { useUser } from "@repo/store/useUser";
-import { useNavigate } from "react-router-dom";
 
 // Constants
 export const INIT_GAME = "init_game";
@@ -45,7 +44,6 @@ const Game = () => {
   const [totalMovesPlayed, setTotalMovesPlayed] = useState<moves[]>([]);
   const [player1TimeConsumed, setPlayer1TimeConsumed] = useState();
   const [player2TimeConsumed, setPlayer2TimeConsumed] = useState();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!socket) {
