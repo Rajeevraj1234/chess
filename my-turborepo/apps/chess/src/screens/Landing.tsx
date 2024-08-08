@@ -31,7 +31,7 @@ const Landing = () => {
       </div>
       <div className="w-1/2 flex flex-col justify-center items-center">
         <h1 className="text-white font-bold text-[4rem]">
-          Play Chess Online <br /> on the #99999 Site!
+          Play Chess Online <br /> on the #9999 Site!
         </h1>
         <div className="flex justify-center gap-5 items-center">
           {user ? (
