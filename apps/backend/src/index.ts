@@ -22,7 +22,7 @@ app.use(
   })
 );
 
-//redis worker
+//redis worker  
 initRedis();
 
 //passpost middleware
