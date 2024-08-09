@@ -21,8 +21,8 @@ RUN npm install
 
 COPY . .
 
-RUN cd packages/db && npx prisma generate && cd ../..
-RUN cd packages/redis_queue && npx tsc -b && node dist/index.js && cd ../..
+RUN npm run db:generate
+RUN npm run redis:build
 
 RUN npm run build
 
