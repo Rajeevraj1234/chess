@@ -7,7 +7,8 @@
     "start":"turbo start",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "db:generate": "cd/packages/db && npx prisma generate && cd ../../"
+    "db:generate": "cd packages/db && npx prisma generate && cd ../..",
+    "redis:build": "cd packages/redis_queue && npx tsc -b && node dist/index.js && cd ../.."
   },
   "devDependencies": {
     "prettier": "^3.2.5",
