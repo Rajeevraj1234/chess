@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+      - "5173:5173"
+    depends_on:
+      - chess-db
+      - chess-redis
+    networks:
+      - chess-network
+    environment:
+      - REDIS_HOST=chess-redis  
+
+  chess-db:
+    image: postgres
+    container_name: chess-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: pass
+
+    ports:
+      - "5432:5432"
+    volumes:
+      - chess-data:/var/lib/postgresql/data
+    networks:
+      - chess-network
+  
+  chess-redis:
+    image: redis
+    container_name: chess-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - chess-network
+    volumes:
+      - chess-data:/data  
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  chess-data:
+
+networks:
+  chess-network:
