@@ -21,7 +21,10 @@ RUN npm install
 
 COPY . .
 
-RUN npm run db:generate
+# this runs the prisma client genration
+RUN npm run db:generate 
+
+#this builds the redis file inside the package
 RUN npm run redis:build
 
 RUN npm run build
