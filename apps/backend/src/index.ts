@@ -22,7 +22,7 @@ app.use(
   })
 );
 
-//redis worker    
+//redis worker to add the move to db
 initRedis();
 
 //passpost middleware
