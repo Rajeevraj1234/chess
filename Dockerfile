@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json turbo.json ./
+COPY package.json turbo.json ./
 
 # copy all package.json from different apps
 COPY apps/chess/package.json ./apps/chess/
@@ -26,4 +26,4 @@ RUN npm run redis:build
 
 RUN npm run build
 
-CMD [ "yarn","dev"]
+CMD [ "yarn" , "dev" ]
