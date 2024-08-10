@@ -5,6 +5,9 @@
   "exports": {
     "./client": "./dist/index.js"
   },
+  "script": {
+    "build": "npx tsc -b"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
