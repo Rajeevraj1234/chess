@@ -4,8 +4,11 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "start":"turbo start",
+    "start": "turbo start",
     "lint": "turbo lint",
+    "build:frontend": "cd apps/chess && npm run build",
+    "build:backend": "cd apps/backend && npx tsc -b ",
+    "build:web-socket": "cd apps/chess && npm tsc -b",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:generate": "cd packages/db && npx prisma generate && cd ../..",
     "redis:build": "cd packages/redis_queue && npx tsc -b && node dist/index.js && cd ../.."
