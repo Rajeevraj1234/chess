@@ -7,6 +7,7 @@ import session from "express-session";
 import { initPassport } from "./passport";
 import passport from "passport";
 import initRedis from "./redis_worker/index"
+const PORT = 3000;
 
 
 dotenv.config();
@@ -53,6 +54,6 @@ app.get("/", async (req, res) => {
 app.use("/auth", authRouter);
 app.use("/v1", v1Router);
 
-app.listen(3000, () => {
-  console.log("backend started at port 3000");
+app.listen(PORT, () => {
+  console.log("backend started at port",PORT);
 });
