@@ -35,8 +35,8 @@ const ChessBoard = ({
   return (
     <div className="relative">
       {winner && (
-        <div className="absolute top-0 left-[0%] bg-black h-[512px] w-[512px] z-[3] opacity-70">
-          <div className="text-white font-bold text-[2.4rem] absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]">
+        <div className="absolute top-0 left-[0%] bg-black h-[385px] w-[385px] md:w-[512px] md:h-[512px] z-[3] opacity-70">
+          <div className="text-white font-bold text-[1.7rem] md:text-[2.4rem] absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]">
             {winner.replace("_", "  ")}
           </div>
         </div>
@@ -86,7 +86,7 @@ const ChessBoard = ({
                         setBoard(chess.board());
                       }
                     }}
-                    className={`w-16 h-16 text-black relative ${
+                    className={`w-12 h-12 md:w-16 md:h-16 text-black relative ${
                       (i + j) % 2 === 0 ? "bg-green-500" : "bg-green-100"
                     }`}
                   >
@@ -98,7 +98,7 @@ const ChessBoard = ({
                       }
                       if (move === squareRepresention)
                         return (
-                          <span key={index} className="absolute top-6 left-6 z-[1] h-4 w-4 bg-gray-500 rounded-full"></span>
+                          <span key={index} className="absolute top-4 left-4 md:top-6 md:left-6 z-[1] h-3 w-3 md:h-4 md:w-4 bg-gray-500 rounded-full"></span>
                         );
                       return null;
                     })}

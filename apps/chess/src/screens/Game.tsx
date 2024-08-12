@@ -110,14 +110,14 @@ const Game = () => {
   }
 
   return (
-    <div className="w-[100vw] h-[100vh] bg-gray-900 ">
-      <div className="text-white font-bold py-10 text-center text-3xl ">
+    <div className="w-[100vw] md:h-[100vh] bg-gray-900 ">
+      <div className="text-white font-bold py-10 text-center text-lg md:text-3xl ">
         {gameMetaData?.whitePlayer?.name}{" "}
         {started && <span className="text-lg text-red-400">vs</span>}{" "}
         {gameMetaData?.blackPlayer?.name}
       </div>
-      <div className="flex mt-[8rem]">
-        <div className="w-1/2 flex justify-end items-center ">
+      <div className="md:flex md:mt-[8rem]">
+        <div className="md:w-1/2 mb-10 md:mb-0 flex justify-center md:justify-end items-center ">
           <ChessBoard
             playerColor={playerColor}
             chess={chess}
@@ -129,8 +129,8 @@ const Game = () => {
           />
         </div>
 
-        <div className="w-1/2 flex flex-col justify-center items-center ">
-          <div className="bg-gray-800 h-[520px] w-[400px] flex flex-col justify-start items-center p-2 ">
+        <div className="md:w-1/2 flex flex-col justify-center items-center ">
+          <div className="bg-gray-800 md:h-[520px] h-[400px] w-[400px] flex flex-col justify-start items-center p-2 ">
             {!started && (
               <div className=" h-full w-full flex flex-col justify-start items-center ">
                 <button
@@ -180,7 +180,7 @@ const Game = () => {
                     </span>{" "}
                   </div>
                 </div>
-                <div className=" h-[70%]">
+                <div className="h-[60%] md:h-[70%]">
                   <div className="my-5 text-white font-bold text-xl">
                     MOVES PLAYED
                   </div>
