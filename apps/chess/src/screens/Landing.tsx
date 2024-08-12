@@ -25,12 +25,12 @@ const Landing = () => {
   };
 
   return (
-    <div className="w-[100vw] h-[100vh] bg-gray-900 flex">
-      <div className="w-1/2 flex justify-center items-center">
-        <img src="/chessboard.png" className="h-[500px]" alt="Chessboard" />
+    <div className="w-[100vw] h-[100vh] bg-gray-900 md:flex">
+      <div className="md:w-1/2 pt-10 md:pt-0 flex justify-center items-center">
+        <img src="/chessboard.png" className=" h-[300px] md:h-[500px] " alt="Chessboard" />
       </div>
-      <div className="w-1/2 flex flex-col justify-center items-center">
-        <h1 className="text-white font-bold text-[4rem]">
+      <div className="md:w-1/2 flex flex-col mt-20 md:mt-20 justify-center items-center">
+        <h1 className="text-white font-bold text-[2rem] md:text-[4rem] ">
           Play Chess Online <br /> on the #9999 Site!
         </h1>
         <div className="flex justify-center gap-5 items-center">
