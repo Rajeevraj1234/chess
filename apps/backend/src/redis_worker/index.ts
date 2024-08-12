@@ -1,5 +1,5 @@
 import { db } from "../db";
-import RedisClient from "@repo/redis_queue/client"; // Set to "nextnode" if you encounter module resolution errors
+import RedisClient from "../redis/index"; // Set to "nextnode" if you encounter module resolution errors
 const client = RedisClient.getInstance();
 
 const QUEUE_NAME = "moveData"; // Define your queue name here

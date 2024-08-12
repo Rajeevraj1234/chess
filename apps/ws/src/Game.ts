@@ -3,8 +3,7 @@ import { ABORT_GAME, GAME_OVER, INIT_GAME, MOVE } from "./messages";
 import { socketManager, User } from "./socketManager";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import RedisClient from "@repo/redis_queue/client";
-import { SocketAddress } from "net";
+import RedisClient from "./redis/index";
 const client = RedisClient.getInstance();
 
 // client.on('error', (err) => console.log('Redis Client Error', err));

@@ -178,7 +178,6 @@ const Game = () => {
                     >
                       ABORT
                     </span>{" "}
-                    <span className="border p-2 text-xs">DRAW</span>
                   </div>
                 </div>
                 <div className=" h-[70%]">
