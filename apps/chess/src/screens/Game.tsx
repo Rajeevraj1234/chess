@@ -65,7 +65,7 @@ const Game = () => {
           user.id === message.payload.WhitePlayer.id
             ? setPlayerColor("white")
             : setPlayerColor("black");
-          
+
           break;
         case MOVE:
           if (message.payload.move) {
@@ -130,7 +130,7 @@ const Game = () => {
         </div>
 
         <div className="md:w-1/2 flex flex-col justify-center items-center ">
-          <div className="bg-gray-800 md:h-[520px] h-[400px] w-[400px] flex flex-col justify-start items-center p-2 ">
+          <div className="bg-gray-800 md:h-[521px] h-[400px] w-[400px] flex flex-col justify-start items-center p-2 ">
             {!started && (
               <div className=" h-full w-full flex flex-col justify-start items-center ">
                 <button
@@ -138,7 +138,7 @@ const Game = () => {
                     socket.send(
                       JSON.stringify({
                         type: INIT_GAME,
-                      })
+                      }),
                     );
                   }}
                   className="px-16 py-4 mt-10 text-lg bg-green-500 font-bold rounded-md"
@@ -172,7 +172,7 @@ const Game = () => {
                             payload: {
                               gameId: gameMetaData?.gameId,
                             },
-                          })
+                          }),
                         );
                       }}
                     >
@@ -188,7 +188,7 @@ const Game = () => {
                     {totalMovesPlayed?.map((move, index) => {
                       return (
                         <div key={index} className="flex text-white gap-7 ">
-                          <span>{index+1}.</span>
+                          <span>{index + 1}.</span>
                           <span>{move.from}</span>
                           <span>{move.to}</span>
                         </div>
